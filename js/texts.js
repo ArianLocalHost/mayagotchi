@@ -54,7 +54,7 @@ const TEXT = {
 
   /* ---------- hints shown when entering a room ---------- */
   hintKitchen: "תגררי את האוכל אל {name}",
-  hintBathroom: "עם הסבון {name} תשפשפי את",
+  hintBathroom: "תשפשפי אותו עם הסבון אל תתביישי",
   hintBedroom: "תכבי את האור כדי לתת ליצור המסכן הזה לישון",
   hintGame: "",
 
