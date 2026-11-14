@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-title" content="מיהגוצ'י">
+  <meta property="og:title" content="מיהגוצ'י">
+  <title>מיהגוצ'י</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- VERSION: change this whenever you upload new files, so phones never show old ones -->
+  <script>window.GAME_VERSION = "20261114b";</script>
+  <link rel="stylesheet" href="css/style.css?v=20261114b">
+</head>
+<body>
+  <!-- All visible words come from js/texts.js -->
+  <div id="loading"><div id="loading-text">טוען...</div><div id="loading-bar"><div id="loading-fill"></div></div></div>
+
+  <div id="game" class="hidden">
+    <!-- Room -->
+    <img id="room-bg" alt="" draggable="false">
+
+    <!-- Pet -->
+    <div id="pet-area">
+      <div id="pet-shadow"></div>
+      <div id="pet">
+        <div id="pet-inner">
+          <img id="pet-img" alt="" draggable="false">
+          <img id="pet-dirt" alt="" draggable="false">
+          <div id="bubbles"></div>
+        </div>
+      </div>
+      <div id="speech" class="hidden"></div>
+    </div>
+
+    <div id="water" class="hidden"></div>
+    <div id="zzz"><span>z</span><span>z</span><span>Z</span></div>
+    <div id="darkness"></div>
+
+    <!-- Top bar: stats -->
+    <div id="topbar">
+      <div class="stat" data-stat="hunger"><div class="ring"><div class="fill"></div><img alt=""></div></div>
+      <div class="stat" data-stat="happiness"><div class="ring"><div class="fill"></div><img alt=""></div></div>
+      <div class="stat" data-stat="energy"><div class="ring"><div class="fill"></div><img alt=""></div></div>
+      <div class="stat" data-stat="cleanliness"><div class="ring"><div class="fill"></div><img alt=""></div></div>
+    </div>
+    <div id="infobar">
+      <button id="name-btn"></button>
+      <span id="stage-label"></span>
+      <button id="sound-btn"><img alt=""></button>
+    </div>
+    <div id="room-title" class="title-text"></div>
+    <div id="hint" class="hidden"></div>
+
+    <!-- Bottom bar: arrows + room actions -->
+    <div id="bottombar">
+      <button id="nav-left" class="nav"><img alt=""></button>
+      <div id="actions"></div>
+      <button id="nav-right" class="nav"><img alt=""></button>
+    </div>
+
+    <!-- Minigame -->
+    <div id="minigame" class="hidden">
+      <canvas id="mg-canvas"></canvas>
+      <div id="mg-hud"><span id="mg-score" class="title-text">0</span><span id="mg-time" class="title-text">30</span>
+        <button id="mg-quit" aria-label="stop"></button></div>
+      <div id="mg-panel" class="panel">
+        <h2 id="mg-title" class="title-text"></h2>
+        <p id="mg-text"></p>
+        <button id="mg-start" class="big-btn"></button>
+        <button id="mg-back" class="big-btn grey"></button>
+      </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="modal" class="hidden">
+      <div class="panel">
+        <h2 id="modal-title" class="title-text"></h2>
+        <p id="modal-text"></p>
+        <label id="modal-label" for="modal-input"></label>
+        <input id="modal-input" type="text" maxlength="16" autocomplete="off" dir="auto">
+        <button id="modal-ok" class="big-btn"></button>
+        <button id="modal-cancel" class="big-btn grey"></button>
+      </div>
+    </div>
+
+    <div id="confetti"></div>
+
+    <!-- Developer test panel (open the game with ?dev=1) — built by game.js -->
+    <button id="dev-btn" class="hidden"></button>
+    <div id="dev" class="hidden"></div>
+  </div>
+
+  <script src="js/texts.js?v=20261114b"></script>
+  <script src="js/config.js?v=20261114b"></script>
+  <script src="js/assets.js?v=20261114b"></script>
+  <script src="js/save.js?v=20261114b"></script>
+  <script src="js/sound.js?v=20261114b"></script>
+  <script src="js/minigame.js?v=20261114b"></script>
+  <script src="js/game.js?v=20261114b"></script>
+</body>
+</html>

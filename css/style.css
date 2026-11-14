@@ -1,0 +1,327 @@
+/* =====================================================================
+   STYLE.CSS — colors and layout. Change the colors in :root below.
+   The game is laid out on a 360px-wide portrait screen and scaled to
+   fit any phone or desktop window. Flat colors + black outlines.
+   ===================================================================== */
+
+@font-face { font-family: "Fredoka"; font-weight: 600; font-display: swap;
+  src: url("../fonts/fredoka-hebrew-500-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: "Fredoka"; font-weight: 600; font-display: swap;
+  src: url("../fonts/fredoka-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122; }
+@font-face { font-family: "Fredoka"; font-weight: 800; font-display: swap;
+  src: url("../fonts/fredoka-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: "Fredoka"; font-weight: 800; font-display: swap;
+  src: url("../fonts/fredoka-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122; }
+
+:root {
+  --line: #111111;             /* the black outline color */
+  --lw: 3px;                   /* outline thickness on buttons/panels */
+  --bar: #f4f4f4;              /* top bar */
+  --panel: #ffffff;            /* popup background */
+  --title: #ff6fa5;            /* popup title color */
+  --text: #111111;             /* normal text */
+  --btn: #7ed321;              /* main button */
+  --btn-grey: #e2e2e2;
+  --good: #7ed321;             /* stat fill: high */
+  --mid: #f5a623;              /* stat fill: medium */
+  --bad: #ff4d4d;              /* stat fill: low */
+  --kitchen: #ff9b42;          /* action button colors per room */
+  --bathroom: #4dabf7;
+  --bedroom: #9b7bff;
+  --game: #ff6fa5;
+  --font: "Fredoka", "Arial Hebrew", "Segoe UI", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: #222;
+  font-family: var(--font); font-weight: 600;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overscroll-behavior: none; touch-action: none;
+}
+body { position: fixed; inset: 0; }
+
+button { font-family: inherit; font-weight: 800; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+.hidden { display: none !important; }
+
+#loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #fff; font-size: 24px; font-weight: 800; }
+#loading-bar { width: 200px; height: 18px; border: 3px solid #fff; border-radius: 10px; overflow: hidden; }
+#loading-fill { width: 0; height: 100%; background: var(--good); transition: width 0.2s; }
+
+/* white text with a black outline (no shadow) */
+.title-text {
+  color: #fff; font-weight: 800;
+  -webkit-text-stroke: 5px var(--line); paint-order: stroke fill;
+}
+
+/* ---------------- game screen (scaled by game.js) ---------------- */
+#game {
+  position: absolute; left: 50%; top: 50%;
+  width: 360px; height: 640px;
+  transform-origin: center center;
+  overflow: hidden; background: #f7e3b0; color: var(--text);
+}
+
+#room-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center bottom; z-index: 0;
+}
+
+/* ---------------- pet ---------------- */
+#pet-area { position: absolute; left: 0; right: 0; bottom: 128px; height: 330px; z-index: 2; }
+#pet {
+  position: absolute; left: 50%; bottom: 0;
+  width: 260px; height: 260px; margin-left: -130px;
+  cursor: pointer; transform-origin: center bottom;
+}
+#pet-inner { position: absolute; inset: 0; transform-origin: center bottom; will-change: transform; }
+#pet-img, #pet-dirt { position: absolute; inset: 0; width: 100%; height: 100%; }
+#pet-dirt { opacity: 0; transition: opacity 0.4s; }
+#bubbles { position: absolute; inset: 0; pointer-events: none; }
+#pet-shadow {
+  position: absolute; left: 50%; bottom: -6px; width: 170px; height: 18px; margin-left: -85px;
+  background: rgba(0, 0, 0, 0.15); border-radius: 50%;
+}
+
+.bubble {
+  position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--line); animation: pop-in 0.2s ease-out;
+}
+.bubble.rinse { transition: opacity 0.8s, transform 0.8s; opacity: 0; transform: translateY(40px); }
+
+/* expressions -> animations (kept small) */
+#pet-inner.idle     { animation: breathe 2.4s ease-in-out infinite; }
+#pet-inner.sad      { animation: breathe 3.6s ease-in-out infinite; }
+#pet-inner.sleeping { animation: breathe 3.2s ease-in-out infinite; }
+#pet-inner.happy    { animation: hop 0.55s ease-out infinite; }
+#pet-inner.eating   { animation: chew 0.28s ease-in-out infinite; }
+#pet.poke   { animation: jiggle 0.4s ease-out; }
+#pet.evolve { animation: evolve 1.4s ease-in-out; }
+
+@keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.03, 0.97); } }
+/* every loop starts and ends at normal size, so switching between them never snaps */
+@keyframes hop {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.06, 0.94); }
+  50% { transform: translateY(-22px) scale(0.96, 1.04); }
+  85% { transform: translateY(0) scale(1.06, 0.94); }
+}
+@keyframes chew { 0%, 100% { transform: scale(1, 1); } 30% { transform: scale(1.06, 0.94); } 70% { transform: scale(0.98, 1.02); } }
+@keyframes jiggle {
+  0% { transform: scale(1, 1); } 25% { transform: scale(1.12, 0.88); }
+  50% { transform: scale(0.92, 1.08); } 75% { transform: scale(1.04, 0.96); } 100% { transform: scale(1, 1); }
+}
+@keyframes evolve {
+  0% { transform: scale(1); filter: brightness(1); }
+  30% { transform: scale(0.6); filter: brightness(2.5); }
+  60% { transform: scale(1.2); filter: brightness(2.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes pop-in { from { transform: scale(0); } to { transform: scale(1); } }
+
+#zzz { display: none; position: absolute; left: 50%; margin-left: 50px; bottom: 330px; z-index: 6; pointer-events: none; direction: ltr; }
+#game.sleeping #zzz { display: block; }
+#zzz span {
+  position: absolute; color: #fff; font-weight: 800; font-size: 26px; opacity: 0;
+  -webkit-text-stroke: 4px var(--line); paint-order: stroke fill; animation: zfloat 3s linear infinite;
+}
+#zzz span:nth-child(2) { animation-delay: 1s; font-size: 32px; }
+#zzz span:nth-child(3) { animation-delay: 2s; font-size: 40px; }
+@keyframes zfloat {
+  0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; }
+  100% { transform: translate(40px, -90px); opacity: 0; }
+}
+
+#speech {
+  position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: 280px;
+  background: #fff; color: var(--text); border: var(--lw) solid var(--line); border-radius: 14px;
+  padding: 6px 14px; font-size: 17px; white-space: nowrap; z-index: 7;
+}
+#speech.pop { animation: pop-in 0.15s ease-out; transform-origin: center bottom; }
+#hint.pop { animation: fade-in 0.3s ease-out; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+#speech::before, #speech::after {
+  content: ""; position: absolute; left: 50%; border-style: solid; border-color: transparent; border-bottom: 0;
+}
+#speech::before { bottom: -13px; margin-left: -10px; border-width: 13px 10px 0; border-top-color: var(--line); }
+#speech::after  { bottom: -8px;  margin-left: -7px;  border-width: 9px 7px 0;   border-top-color: #fff; }
+
+/* shower water (drops fall from the top of the screen to the pet) */
+#water { position: absolute; top: 0; bottom: 0; z-index: 3; pointer-events: none; transition: opacity 0.4s; }
+#water.stop { opacity: 0; }
+#water .drop {
+  position: absolute; top: -26px; width: 7px; height: 24px; margin-left: -3px; border-radius: 4px;
+  background: #4dabf7; border: 2px solid var(--line);
+  animation: drop-fall linear infinite both; will-change: transform;
+}
+@keyframes drop-fall {
+  0% { transform: translateY(0); opacity: 1; }
+  92% { opacity: 1; }
+  100% { transform: translateY(var(--fall)); opacity: 0; }
+}
+#water .splash {
+  position: absolute; top: var(--hit); width: 9px; height: 9px; margin-left: -4px; border-radius: 50%;
+  background: #4dabf7; border: 2px solid var(--line); opacity: 0;
+  animation: splash 0.5s ease-out infinite;
+}
+@keyframes splash {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+  50% { transform: translate(calc(var(--dx) * 0.6), -16px) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), 4px) scale(0.6); opacity: 0; }
+}
+
+/* bedroom lights */
+#darkness {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background: #0b0b2a; opacity: 0; transition: opacity 0.5s;
+}
+#game.lights-off #darkness { opacity: 0.6; }
+
+/* ---------------- top bar ---------------- */
+#topbar {
+  position: absolute; top: 0; left: 0; right: 0; height: 72px; z-index: 5; direction: ltr;
+  display: flex; justify-content: space-around; align-items: center;
+  background: var(--bar); border-bottom: var(--lw) solid var(--line); padding: 0 16px;
+}
+.ring {
+  position: relative; width: 52px; height: 52px; border-radius: 50%; overflow: hidden;
+  background: #fff; border: var(--lw) solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.ring .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 50%; background: var(--good); transition: height 0.4s, background 0.4s; }
+.ring img { position: relative; width: 32px; height: 32px; }
+.stat.low .ring { animation: low-blink 1s steps(2) infinite; }
+@keyframes low-blink { 50% { border-color: var(--bad); } }
+.stat.bump .ring { animation: bump 0.3s; }
+@keyframes bump { 50% { transform: scale(1.15); } }
+
+#infobar {
+  position: absolute; top: 80px; left: 12px; right: 12px; height: 38px; z-index: 5;
+  display: flex; align-items: center; gap: 8px;
+}
+#name-btn { font-size: 20px; max-width: 190px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  color: #fff; -webkit-text-stroke: 4px var(--line); paint-order: stroke fill; padding: 2px; }
+#stage-label { background: #fff; border: 2px solid var(--line); font-size: 13px; padding: 2px 10px; border-radius: 10px; }
+#sound-btn {
+  margin-inline-start: auto; width: 38px; height: 38px; border-radius: 50%;
+  background: #8a8a9a; border: var(--lw) solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+#sound-btn img { width: 24px; height: 24px; }
+
+#room-title { position: absolute; top: 120px; left: 0; right: 0; text-align: center; font-size: 28px; z-index: 5; }
+
+#hint {
+  position: absolute; left: 10px; right: 10px; top: 162px; text-align: center; z-index: 5; font-size: 15px;
+  color: #fff; -webkit-text-stroke: 3px var(--line); paint-order: stroke fill;
+}
+
+/* ---------------- bottom bar ---------------- */
+#bottombar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 116px; z-index: 5; direction: ltr;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 8px 10px;
+}
+.nav { width: 58px; height: 58px; }
+.nav img { width: 100%; height: 100%; }
+.nav:active { transform: scale(0.9); }
+#actions { flex: 1; display: flex; justify-content: center; align-items: center; gap: 16px; height: 100%; }
+
+.act {
+  width: 78px; height: 78px; border-radius: 50%;
+  background: var(--room-color, var(--kitchen)); border: var(--lw) solid var(--line);
+  position: relative; touch-action: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.act img { width: 52px; height: 52px; }
+.act:active, .act.pressed { transform: scale(0.92); }
+.act.off { background: #8a8a9a; }
+
+/* kitchen food picker */
+.food-picker { display: flex; align-items: center; gap: 8px; }
+.food-arrow { width: 32px; height: 32px; }
+.food-arrow img { width: 100%; height: 100%; }
+.food-slot {
+  width: 90px; height: 90px; border-radius: 50%; background: #fff; border: var(--lw) solid var(--line);
+  position: relative; touch-action: none; display: flex; align-items: center; justify-content: center;
+}
+.food-slot img { width: 62px; height: 62px; }
+.food-name {
+  position: absolute; left: -30px; right: -30px; top: -24px; text-align: center; white-space: nowrap; font-size: 15px;
+  color: #fff; font-weight: 800; -webkit-text-stroke: 3px var(--line); paint-order: stroke fill;
+}
+
+/* things flying around (food, soap) */
+.floating { position: absolute; left: 0; top: 0; z-index: 8; pointer-events: none; will-change: transform; }
+.floating.fly { transition: transform 0.4s ease-in; }
+.crumb {
+  position: absolute; left: 0; top: 0; z-index: 8; width: 9px; height: 9px; margin: -4px 0 0 -4px; border-radius: 50%;
+  border: 2px solid var(--line); pointer-events: none; transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+}
+
+/* ---------------- popups ---------------- */
+#modal { position: absolute; inset: 0; z-index: 30; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; animation: fade-in 0.2s ease-out; }
+.panel {
+  width: 300px; background: var(--panel); border: 4px solid var(--line); border-radius: 18px;
+  padding: 18px 18px 20px; text-align: center; color: var(--text); animation: pop-in 0.15s ease-out;
+}
+.panel h2 { margin: 0 0 10px; font-size: 30px; color: var(--title); }
+.panel p { margin: 0 0 14px; font-size: 17px; line-height: 1.4; white-space: pre-line; }
+.panel label { display: block; font-size: 15px; margin-bottom: 6px; }
+.panel input {
+  width: 100%; font: inherit; font-size: 22px; text-align: center; padding: 8px; margin-bottom: 12px;
+  border: var(--lw) solid var(--line); border-radius: 12px; background: #fff; color: var(--text); outline: none;
+  user-select: text; -webkit-user-select: text; touch-action: manipulation;
+}
+.big-btn {
+  display: block; width: 100%; padding: 10px; margin-top: 10px; font-size: 24px;
+  background: var(--btn); border: var(--lw) solid var(--line); border-radius: 14px; touch-action: manipulation;
+  color: #fff; -webkit-text-stroke: 4px var(--line); paint-order: stroke fill;
+}
+.big-btn:active { transform: scale(0.97); }
+.big-btn.grey { background: var(--btn-grey); font-size: 19px; padding: 7px; }
+
+/* ---------------- confetti ---------------- */
+#confetti { position: absolute; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; }
+.confetti { position: absolute; top: -20px; width: 10px; height: 14px; border: 2px solid var(--line); animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(900px) rotate(720deg); } }
+
+/* ---------------- minigame ---------------- */
+#minigame { position: absolute; inset: 0; z-index: 20; background: #bdf0ff; }
+#mg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+#mg-hud { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; align-items: center; gap: 18px; font-size: 30px; direction: ltr; }
+#mg-time::before { content: "⏱ "; font-size: 22px; -webkit-text-stroke: 0; }
+#mg-quit {
+  margin-left: auto; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--bad); border: var(--lw) solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+/* the X is drawn in code (white with a black edge), no picture file needed */
+#mg-quit::before {
+  content: ""; width: 26px; height: 26px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cg stroke-linecap='round'%3E%3Cpath d='M36 36L92 92M92 36L36 92' stroke='%23111' stroke-width='34'/%3E%3Cpath d='M36 36L92 92M92 36L36 92' stroke='%23fff' stroke-width='16'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+#mg-panel { position: absolute; left: 30px; top: 20%; }
+
+/* ---------------- developer test panel ---------------- */
+#dev-btn {
+  position: absolute; left: 8px; top: 160px; z-index: 29; width: 40px; height: 40px; font-size: 20px;
+  background: #222; border-radius: 10px; border: 2px solid #0f0;
+}
+#dev {
+  position: absolute; left: 6px; right: 6px; top: 76px; bottom: 124px; z-index: 25; overflow-y: auto;
+  background: rgba(20, 20, 20, 0.93); color: #fff; border-radius: 12px; padding: 10px; font-size: 13px;
+  touch-action: pan-y;
+}
+#dev h3 { margin: 0 0 6px; font-size: 16px; color: #0f0; }
+#dev .row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 8px; }
+#dev .lbl { width: 100%; color: #9f9; font-size: 12px; margin-top: 2px; }
+#dev button.d { background: #333; color: #fff; font-size: 13px; font-weight: 600; padding: 6px 9px; border-radius: 6px; border: 1px solid #555; }
+#dev button.d:active { background: #0a0; }
+#dev .slider { display: flex; align-items: center; gap: 6px; width: 100%; }
+#dev .slider span { width: 62px; }
+#dev .slider input { flex: 1; touch-action: pan-x; direction: ltr; }
+#dev .slider b { width: 32px; text-align: center; }
+#dev .info { color: #ccc; font-size: 12px; white-space: pre-line; margin-bottom: 8px; }
